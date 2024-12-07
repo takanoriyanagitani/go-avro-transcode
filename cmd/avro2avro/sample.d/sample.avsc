@@ -1,0 +1,10 @@
+{
+	"type": "record",
+	"name": "sample_record",
+	"fields": [
+	  {"name": "active", "type":"boolean"},
+	  {"name": "price", "type":"double"},
+	  {"name": "name", "type":"string"},
+	  {"name": "updated", "type":["null", "string"]}
+	]
+}
