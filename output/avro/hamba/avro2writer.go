@@ -57,6 +57,11 @@ func InputToHambaAvroWriter(
 		if nil != e {
 			return e
 		}
+
+		e = enc.Flush()
+		if nil != e {
+			return e
+		}
 	}
 
 	return enc.Flush()
