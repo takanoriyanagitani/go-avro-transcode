@@ -13,6 +13,24 @@ type Input struct {
 	InputRecords
 }
 
+const (
+	MaxBlobSizeForRead int = 1048576
+)
+
+type InputConfig struct {
+	maxBlobSize int
+}
+
+func (i InputConfig) WithBlobSizeMax(s int) InputConfig {
+	i.maxBlobSize = s
+	return i
+}
+
+func (i InputConfig) BlobSizeMax() int { return i.maxBlobSize }
+
+var InputConfigDefault InputConfig = InputConfig{}.
+	WithBlobSizeMax(MaxBlobSizeForRead)
+
 type CodecName string
 
 const (

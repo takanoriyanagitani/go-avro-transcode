@@ -24,7 +24,27 @@ func GetEnvByKey(key string) util.IO[string] {
 	}
 }
 
-var inputs util.IO[at.Input] = ah.StdinToMaps
+var maxBlobSizeString util.IO[string] = GetEnvByKey("ENV_BLOB_SIZE_MAX").
+	OrElse(util.Of("1048576"))
+var maxBlobSize util.IO[int] = util.Bind(
+	maxBlobSizeString,
+	util.Lift(strconv.Atoi),
+)
+
+var inputConfig util.IO[at.InputConfig] = util.Bind(
+	maxBlobSize,
+	util.Lift(func(b int) (at.InputConfig, error) {
+		return at.InputConfigDefault.
+			WithBlobSizeMax(b), nil
+	}),
+)
+
+var inputs util.IO[at.Input] = util.Bind(
+	inputConfig,
+	func(c at.InputConfig) util.IO[at.Input] {
+		return ah.ConfigToStdinToMaps(c)
+	},
+)
 
 var codec util.IO[at.CodecName] = util.Bind(
 	GetEnvByKey("ENV_CODEC_NAME"),
@@ -35,9 +55,7 @@ var codec util.IO[at.CodecName] = util.Bind(
 
 var blockSize util.IO[int] = util.Bind(
 	GetEnvByKey("ENV_BLOCK_SIZE"),
-	util.Lift(func(s string) (int, error) {
-		return strconv.Atoi(s)
-	}),
+	util.Lift(strconv.Atoi),
 ).OrElse(util.Of(at.BlockLengthDefault))
 
 var cfg util.IO[at.SimpleOutputConfig] = util.Bind(
